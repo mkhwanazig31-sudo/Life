@@ -117,33 +117,7 @@ function Player({ places, setTrigger, controlsRef }){
       </group>
     </group>
   )
-}
-  
-  return (
-    // FIXED: player now stands ON ground, not inside it
-    <group ref={g} position={[-62,0.9,-32]}>
-      {/* body */}
-      <mesh position={[0,0.45,0]} castShadow>
-        <boxGeometry args={[0.45,0.7,0.25]}/>
-        <meshStandardMaterial color="#ff3d00"/>
-      </mesh>
-      {/* head - smaller */}
-      <mesh position={[0,1.15,0]} castShadow>
-        <sphereGeometry args={[0.28,12,12]}/>
-        <meshStandardMaterial color="#ffcc99"/>
-      </mesh>
-      {/* legs */}
-      <mesh position={[-0.12,0,0]} castShadow>
-        <boxGeometry args={[0.15,0.7,0.18]}/>
-        <meshStandardMaterial color="#212121"/>
-      </mesh>
-      <mesh position={[0.12,0,0]} castShadow>
-        <boxGeometry args={[0.15,0.7,0.18]}/>
-        <meshStandardMaterial color="#212121"/>
-      </mesh>
-    </group>
-  )
-}
+} 
 export default function KasiRPG(){
   const [trigger,setTrigger]=useState(null);
   const controlsRef=useRef({move:{x:0,z:0},yaw:0,pitch:0.4});
