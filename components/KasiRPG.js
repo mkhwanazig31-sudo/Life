@@ -75,21 +75,49 @@ function Player({ places, setTrigger, controlsRef }){
   useFrame((s,dt)=>{
     if(!g.current) return;
     const mv=controlsRef.current.move;
-    const sp=6; 
+    const sp=5; 
     const np={x:g.current.position.x+mv.x*sp*dt, z:g.current.position.z - mv.z*sp*dt}; 
     keepInsideWorld(np); 
     g.current.position.x=np.x; 
     g.current.position.z=np.z;
     if(Math.abs(mv.x)>0.02||Math.abs(mv.z)>0.02) g.current.rotation.y=Math.atan2(mv.x,mv.z);
-    const trig = getNearbyTrigger({x:g.current.position.x,z:g.current.position.z}, places, 9); 
+    const trig = getNearbyTrigger({x:g.current.position.x,z:g.current.position.z}, places, 7); 
     setTrigger(trig||null);
     const yaw=controlsRef.current.yaw; const pitch=controlsRef.current.pitch;
-    const dist=6.5; const height=1.2 + pitch*4;
+    const dist=5; const height=1.2 + pitch*3;
     const cx=g.current.position.x + Math.sin(yaw)*dist; 
     const cz=g.current.position.z + Math.cos(yaw)*dist;
     s.camera.position.lerp(new THREE.Vector3(cx,height,cz),0.18); 
-    s.camera.lookAt(g.current.position.x,1.6,g.current.position.z)
+    s.camera.lookAt(g.current.position.x,0.8,g.current.position.z)
   })
+  
+  return (
+    // TINY PROPORTIONAL KASI GUY - can fit inside house
+    <group ref={g} position={[-62,0,-32]} scale={[0.55,0.55,0.55]}>
+      <group position={[0,1.5,0]}>
+        {/* head */}
+        <mesh position={[0,1.05,0]} castShadow>
+          <sphereGeometry args={[0.18,10,10]}/>
+          <meshStandardMaterial color="#ffcc99"/>
+        </mesh>
+        {/* body */}
+        <mesh position={[0,0.5,0]} castShadow>
+          <boxGeometry args={[0.4,0.6,0.22]}/>
+          <meshStandardMaterial color="#ff3d00"/>
+        </mesh>
+        {/* legs */}
+        <mesh position={[-0.1,0,0]} castShadow>
+          <boxGeometry args={[0.12,0.5,0.14]}/>
+          <meshStandardMaterial color="#212121"/>
+        </mesh>
+        <mesh position={[0.1,0,0]} castShadow>
+          <boxGeometry args={[0.12,0.5,0.14]}/>
+          <meshStandardMaterial color="#212121"/>
+        </mesh>
+      </group>
+    </group>
+  )
+}
   
   return (
     // FIXED: player now stands ON ground, not inside it
