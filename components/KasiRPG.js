@@ -71,23 +71,51 @@ function Scene({houses, places}){
 }
 
 function Player({ places, setTrigger, controlsRef }){
-  const g = useRef(); const t=useRef(0)
+  const g = useRef();
   useFrame((s,dt)=>{
     if(!g.current) return;
     const mv=controlsRef.current.move;
-    const sp=6; const np={x:g.current.position.x+mv.x*sp*dt, z:g.current.position.z - mv.z*sp*dt}; keepInsideWorld(np); g.current.position.x=np.x; g.current.position.z=np.z;
+    const sp=6; 
+    const np={x:g.current.position.x+mv.x*sp*dt, z:g.current.position.z - mv.z*sp*dt}; 
+    keepInsideWorld(np); 
+    g.current.position.x=np.x; 
+    g.current.position.z=np.z;
     if(Math.abs(mv.x)>0.02||Math.abs(mv.z)>0.02) g.current.rotation.y=Math.atan2(mv.x,mv.z);
-    const trig = getNearbyTrigger({x:g.current.position.x,z:g.current.position.z}, places, 9); setTrigger(trig||null);
-
-    // YAW + PITCH CAMERA
+    const trig = getNearbyTrigger({x:g.current.position.x,z:g.current.position.z}, places, 9); 
+    setTrigger(trig||null);
     const yaw=controlsRef.current.yaw; const pitch=controlsRef.current.pitch;
     const dist=6.5; const height=1.2 + pitch*4;
-    const cx=g.current.position.x + Math.sin(yaw)*dist; const cz=g.current.position.z + Math.cos(yaw)*dist;
-    s.camera.position.lerp(new THREE.Vector3(cx,height,cz),0.18); s.camera.lookAt(g.current.position.x,1,g.current.position.z)
+    const cx=g.current.position.x + Math.sin(yaw)*dist; 
+    const cz=g.current.position.z + Math.cos(yaw)*dist;
+    s.camera.position.lerp(new THREE.Vector3(cx,height,cz),0.18); 
+    s.camera.lookAt(g.current.position.x,1.6,g.current.position.z)
   })
-  return (<group ref={g} position={[-62,0,-32]}><mesh castShadow><boxGeometry args={[0.5,0.6,0.28]}/><meshStandardMaterial color="#ff3d00"/></mesh><mesh position={[0,0.5,0]}><sphereGeometry args={[0.24,10,10]}/><meshStandardMaterial color="#ffcc99"/></mesh></group>)
+  
+  return (
+    // FIXED: player now stands ON ground, not inside it
+    <group ref={g} position={[-62,0.9,-32]}>
+      {/* body */}
+      <mesh position={[0,0.45,0]} castShadow>
+        <boxGeometry args={[0.45,0.7,0.25]}/>
+        <meshStandardMaterial color="#ff3d00"/>
+      </mesh>
+      {/* head - smaller */}
+      <mesh position={[0,1.15,0]} castShadow>
+        <sphereGeometry args={[0.28,12,12]}/>
+        <meshStandardMaterial color="#ffcc99"/>
+      </mesh>
+      {/* legs */}
+      <mesh position={[-0.12,0,0]} castShadow>
+        <boxGeometry args={[0.15,0.7,0.18]}/>
+        <meshStandardMaterial color="#212121"/>
+      </mesh>
+      <mesh position={[0.12,0,0]} castShadow>
+        <boxGeometry args={[0.15,0.7,0.18]}/>
+        <meshStandardMaterial color="#212121"/>
+      </mesh>
+    </group>
+  )
 }
-
 export default function KasiRPG(){
   const [trigger,setTrigger]=useState(null);
   const controlsRef=useRef({move:{x:0,z:0},yaw:0,pitch:0.4});
