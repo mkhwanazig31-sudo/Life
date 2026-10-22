@@ -4,16 +4,57 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { WORLD, getNearbyTrigger, generateKasiHouses, keepInsideWorld } from '../lib/protocol'
 import * as THREE from 'three'
 
-function House({ pos, side, neighborhood, isHome }){
-  const rot = side===-1? Math.PI/2 : -Math.PI/2
+// RDP COLOURS from the picture
+const RDP_COLORS = ["#aed6f1", "#fdebd0", "#a9dfbf", "#f9e5e5", "#f5cba7", "#d5f5e3", "#fcf3cf", "#e8daef"]
+
+function generateKasiHousesFixed(){
+  const houses = []
+  const SPACING = 22 // proper gap like pic
+  const SIDE = 16
+  for(let i=0; i<7; i++){
+    const z = -i * SPACING - 15
+    const colL = RDP_COLORS[Math.floor(Math.random()*RDP_COLORS.length)]
+    const colR = RDP_COLORS[Math.floor(Math.random()*RDP_COLORS.length)]
+    houses.push({ id:`L-${i}`, pos:[-SIDE, z], side:-1, color:colL, isHome:i===1 })
+    houses.push({ id:`R-${i}`, pos:[SIDE, z], side:1, color:colR, isHome:false })
+  }
+  // your home - green like in your screenshot
+  houses[1].color = "#00e676"
+  houses[1].isHome = true
+  return houses
+}
+
+function House({ pos, side, color, isHome }){
+  const rot = side===-1 ? Math.PI/2 : -Math.PI/2
   return (
     <group position={[pos[0],0,pos[1]]} rotation={[0,rot,0]}>
-      <mesh position={[0,0.01,0]} rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[6,6]}/><meshStandardMaterial color={isHome?"#00ff88":"#aed581"}/></mesh>
-      <mesh position={[0,1.1,0]} castShadow><boxGeometry args={[4.2,2.2,4.2]}/><meshStandardMaterial color={isHome?"#00e676":"#e0e0e0"}/></mesh>
-      <mesh position={[0,2.4,0]} castShadow><boxGeometry args={[5,0.4,5]}/><meshStandardMaterial color="#b71c1c"/></mesh>
+      {/* YARD - like pic 12x16 */}
+      <mesh position={[0,0.01,0]} rotation={[-Math.PI/2,0,0]} receiveShadow>
+        <planeGeometry args={[16,18]}/>
+        <meshStandardMaterial color={isHome ? "#00ff88" : "#d6c7b8"}/>
+      </mesh>
+      {/* Low fence */}
+      <group>
+        <mesh position={[0,0.4,9]}><boxGeometry args={[16,0.5,0.15]}/><meshStandardMaterial color="#8d6e63"/></mesh>
+        <mesh position={[8,0.4,0]}><boxGeometry args={[0.15,0.5,18]}/><meshStandardMaterial color="#8d6e63"/></mesh>
+        <mesh position={[-8,0.4,0]}><boxGeometry args={[0.15,0.5,18]}/><meshStandardMaterial color="#8d6e63"/></mesh>
+      </group>
+      {/* RDP HOUSE - structured, simple box */}
+      <mesh position={[0,1.1,0]} castShadow receiveShadow>
+        <boxGeometry args={[5,2.2,6]}/>
+        <meshStandardMaterial color={color}/>
+      </mesh>
+      {/* Red roof */}
+      <mesh position={[0,2.45,0]} castShadow>
+        <boxGeometry args={[5.6,0.35,6.6]}/>
+        <meshStandardMaterial color="#b71c1c"/>
+      </mesh>
+      {/* Door + window like RDP */}
+      <mesh position={[1.2,0.9,3.01]}><planeGeometry args={[0.8,1.2]}/><meshStandardMaterial color="#4e342e"/></mesh>
+      <mesh position={[-1.2,1,3.01]}><planeGeometry args={[0.9,0.9]}/><meshStandardMaterial color="#90caf9"/></mesh>
     </group>
   )
-}
+        }
 function Spaza({ pos }){ return <group position={[pos[0],0,pos[1]]}><mesh position={[0,1,0]} castShadow><boxGeometry args={[4,2,4]}/><meshStandardMaterial color="#ff9800"/></mesh></group> }
 function School({ pos }){ return <group position={[pos[0],0,pos[1]]}><mesh position={[0,1.5,0]} castShadow><boxGeometry args={[12,3,6]}/><meshStandardMaterial color="#fafafa"/></mesh></group> }
 
